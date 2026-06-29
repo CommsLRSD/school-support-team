@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="assets/css/styles.css" />
@@ -22,7 +22,7 @@
     <!-- Header / navigation -->
     <header class="site-header" id="site-header">
       <div class="container header-inner">
-        <a class="brand" href="#top" data-panel="panel-home" aria-label="School and Classroom Support Team home">
+        <a class="brand" href="#top" aria-label="School and Classroom Support Team home">
           <span class="brand-mark" aria-hidden="true">SCST</span>
           <span class="brand-text">
             <strong>School &amp; Classroom Support Team</strong>
@@ -40,19 +40,17 @@
             <span class="nav-toggle-bar" aria-hidden="true"></span>
           </button>
           <ul id="nav-menu" class="nav-menu">
-            <li><a href="#who-we-are" data-panel="panel-about">Who We Are</a></li>
-            <li><a href="#support" data-panel="panel-support">How We Help</a></li>
-            <li><a href="#team" data-panel="panel-team">Our Team</a></li>
-            <li><a href="#schools" data-panel="panel-schools">For Schools</a></li>
-            <li><a class="nav-cta" href="#contact" data-panel="panel-contact">Contact</a></li>
+            <li><a href="#who-we-are">Who We Are</a></li>
+            <li><a href="#support">How We Help</a></li>
+            <li><a href="#team">Our Team</a></li>
+            <li><a href="#schools">For Schools</a></li>
+            <li><a class="nav-cta" href="#contact">Contact</a></li>
           </ul>
         </nav>
       </div>
     </header>
 
     <main id="main">
-      <!-- Panel: Home -->
-      <div class="panel panel-active" id="panel-home">
       <!-- Hero -->
       <section class="hero" id="top">
         <div class="hero-glow" aria-hidden="true"></div>
@@ -61,16 +59,13 @@
           <h1 class="hero-title">School &amp; Classroom Support Team</h1>
           <p class="hero-tagline" id="hero-tagline"></p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#team" data-panel="panel-team">Meet the team</a>
-            <a class="btn btn-ghost" href="#support" data-panel="panel-support">How we support schools</a>
+            <a class="btn btn-primary" href="#team">Meet the team</a>
+            <a class="btn btn-ghost" href="#support">How we support schools</a>
           </div>
           <dl class="hero-stats" id="hero-stats"></dl>
         </div>
       </section>
-      </div><!-- /panel-home -->
 
-      <!-- Panel: Who We Are + Why It Matters -->
-      <div class="panel" id="panel-about">
       <!-- Who we are -->
       <section class="section" id="who-we-are">
         <div class="container">
@@ -112,10 +107,7 @@
           </div>
         </div>
       </section>
-      </div><!-- /panel-about -->
 
-      <!-- Panel: How We Help + Using Data -->
-      <div class="panel" id="panel-support">
       <!-- How we support: tiers -->
       <section class="section" id="support">
         <div class="container">
@@ -155,10 +147,7 @@
           </div>
         </div>
       </section>
-      </div><!-- /panel-support -->
 
-      <!-- Panel: Our Team -->
-      <div class="panel" id="panel-team">
       <!-- Team directory -->
       <section class="section" id="team">
         <div class="container">
@@ -185,8 +174,8 @@
               <input
                 type="search"
                 id="team-search"
-                placeholder="Search by name, role, or keyword…"
-                aria-label="Search team members by name, role, or keyword"
+                placeholder="Search by name or role…"
+                aria-label="Search team members by name or role"
               />
             </div>
             <div class="filter-chips" id="area-filters" role="group" aria-label="Filter team by area"></div>
@@ -199,10 +188,7 @@
           </p>
         </div>
       </section>
-      </div><!-- /panel-team -->
 
-      <!-- Panel: For Schools + Looking Ahead -->
-      <div class="panel" id="panel-schools">
       <!-- For schools: school-based support + equity model -->
       <section class="section section-muted" id="schools">
         <div class="container">
@@ -241,10 +227,7 @@
           <p class="lead-callout" id="ahead-mentorship"></p>
         </div>
       </section>
-      </div><!-- /panel-schools -->
 
-      <!-- Panel: Contact -->
-      <div class="panel" id="panel-contact">
       <!-- Contact -->
       <section class="section section-contact" id="contact">
         <div class="container">
@@ -264,18 +247,17 @@
           </p>
         </div>
       </section>
-
-      <footer class="site-footer">
-        <div class="container footer-inner">
-          <div>
-            <p class="footer-brand">School &amp; Classroom Support Team</p>
-            <p class="footer-sub">Louis Riel School Division</p>
-          </div>
-          <p class="footer-tagline" id="footer-tagline"></p>
-        </div>
-      </footer>
-      </div><!-- /panel-contact -->
     </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <p class="footer-brand">School &amp; Classroom Support Team</p>
+          <p class="footer-sub">Louis Riel School Division</p>
+        </div>
+        <p class="footer-tagline" id="footer-tagline"></p>
+      </div>
+    </footer>
 
     <!-- Member bio modal -->
     <div class="modal" id="member-modal" hidden>
@@ -296,7 +278,6 @@
           </div>
         </div>
         <p class="modal-bio" id="modal-bio"></p>
-        <div class="member-tags modal-tags" id="modal-tags"></div>
       </div>
     </div>
 
