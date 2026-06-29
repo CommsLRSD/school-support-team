@@ -258,6 +258,13 @@
     info.appendChild(
       el("span", { class: "member-role", html: highlight(member.role, activeQuery) })
     );
+    if (member.tags && member.tags.length) {
+      const tagsEl = el("div", { class: "member-tags" });
+      member.tags.slice(0, 3).forEach((tag) => {
+        tagsEl.appendChild(el("span", { class: "member-tag", text: tag }));
+      });
+      info.appendChild(tagsEl);
+    }
     card.appendChild(info);
     card.appendChild(el("span", { class: "view-bio", text: "View bio →" }));
     card.addEventListener("click", () => openModal(member));
@@ -269,7 +276,8 @@
     const q = activeQuery.toLowerCase();
     return (
       member.name.toLowerCase().includes(q) ||
-      member.role.toLowerCase().includes(q)
+      member.role.toLowerCase().includes(q) ||
+      (member.tags || []).some((tag) => tag.toLowerCase().includes(q))
     );
   }
 
@@ -374,8 +382,6 @@
           : `${visibleCount} team members across ${data.areas.length} areas of support`;
       countEl.textContent = label;
     }
-
-    observeReveals();
   }
 
   function renderFilters() {
@@ -418,6 +424,11 @@
 
   /* --------------------------------------------------------------- Modal */
   let lastFocused = null;
+
+  function getActivePanel() {
+    return document.getElementById(activePanel);
+  }
+
   function openModal(member) {
     lastFocused = document.activeElement;
     const modal = $("#member-modal");
@@ -430,15 +441,26 @@
       member.areaName + (member.subteam ? " · " + member.subteam : "");
     $("#modal-area").textContent = areaLabel;
     $("#modal-bio").textContent = member.bio;
+    const modalTags = $("#modal-tags");
+    modalTags.innerHTML = "";
+    if (member.tags && member.tags.length) {
+      member.tags.forEach((tag) => {
+        modalTags.appendChild(el("span", { class: "member-tag", text: tag }));
+      });
+    }
+    // Lock the active panel's scroll so it doesn't scroll behind the modal
+    const panel = getActivePanel();
+    if (panel) panel.style.overflow = "hidden";
     modal.hidden = false;
-    document.body.style.overflow = "hidden";
     $(".modal-close", modal).focus();
   }
 
   function closeModal() {
     const modal = $("#member-modal");
     modal.hidden = true;
-    document.body.style.overflow = "";
+    // Restore active panel scroll
+    const panel = getActivePanel();
+    if (panel) panel.style.overflow = "";
     if (lastFocused) lastFocused.focus();
   }
 
@@ -454,47 +476,73 @@
 
   /* ---------------------------------------------------- Header & nav UX */
   function wireHeader() {
-    const header = $("#site-header");
-    const onScroll = () => {
-      header.classList.toggle("scrolled", window.scrollY > 8);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    // Mobile nav toggle
+    // Mobile nav toggle only — header always shows border in panel layout
     const toggle = $(".nav-toggle");
     const menu = $("#nav-menu");
-    toggle.addEventListener("click", () => {
-      const open = menu.classList.toggle("open");
-      toggle.setAttribute("aria-expanded", String(open));
-    });
-    menu.addEventListener("click", (e) => {
-      if (e.target.tagName === "A") {
-        menu.classList.remove("open");
-        toggle.setAttribute("aria-expanded", "false");
-      }
+    if (toggle && menu) {
+      toggle.addEventListener("click", () => {
+        const open = menu.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(open));
+      });
+    }
+  }
+
+  /* -------------------------------------------------------- Panel system */
+  const HREF_TO_PANEL = {
+    "#top":         "panel-home",
+    "#who-we-are":  "panel-about",
+    "#why":         "panel-about",
+    "#support":     "panel-support",
+    "#data":        "panel-support",
+    "#team":        "panel-team",
+    "#schools":     "panel-schools",
+    "#ahead":       "panel-schools",
+    "#contact":     "panel-contact",
+  };
+
+  const DEFAULT_PANEL = "panel-team";
+  let activePanel = DEFAULT_PANEL;
+
+  function updateNavActive() {
+    $$(".nav-menu a").forEach((a) => {
+      const href = a.getAttribute("href");
+      const panelId = HREF_TO_PANEL[href];
+      a.classList.toggle("active", panelId === activePanel);
     });
   }
 
-  // Scroll-spy: highlight the active nav link.
-  function wireScrollSpy() {
-    const sections = $$("main section[id]");
-    const links = new Map(
-      $$(".nav-menu a").map((a) => [a.getAttribute("href").slice(1), a])
-    );
-    const spy = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            links.forEach((a) => a.classList.remove("active"));
-            const link = links.get(entry.target.id);
-            if (link) link.classList.add("active");
-          }
-        });
-      },
-      { rootMargin: "-45% 0px -50% 0px" }
-    );
-    sections.forEach((s) => spy.observe(s));
+  function showPanel(id) {
+    $$(".panel").forEach((p) => {
+      const isActive = p.id === id;
+      p.classList.toggle("panel-active", isActive);
+      p.setAttribute("aria-hidden", isActive ? "false" : "true");
+    });
+    activePanel = id;
+    updateNavActive();
+  }
+
+  function wirePanels() {
+    // Intercept any click on an element with data-panel
+    document.addEventListener("click", (e) => {
+      const trigger = e.target.closest("[data-panel]");
+      if (!trigger) return;
+      const panelId = trigger.getAttribute("data-panel");
+      if (!panelId) return;
+      e.preventDefault();
+      showPanel(panelId);
+      // Close mobile nav if open
+      const menu = $("#nav-menu");
+      const toggle = $(".nav-toggle");
+      if (menu && menu.classList.contains("open")) {
+        menu.classList.remove("open");
+        toggle && toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    // Show initial panel based on URL hash or default
+    const hash = window.location.hash;
+    const initial = (hash && HREF_TO_PANEL[hash]) || DEFAULT_PANEL;
+    showPanel(initial);
   }
 
   // Reveal-on-scroll animation.
@@ -526,8 +574,7 @@
     wireSearch();
     wireModal();
     wireHeader();
-    wireScrollSpy();
-    observeReveals();
+    wirePanels();
   }
 
   if (document.readyState === "loading") {
