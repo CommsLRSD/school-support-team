@@ -424,6 +424,11 @@
 
   /* --------------------------------------------------------------- Modal */
   let lastFocused = null;
+
+  function getActivePanel() {
+    return document.getElementById(activePanel);
+  }
+
   function openModal(member) {
     lastFocused = document.activeElement;
     const modal = $("#member-modal");
@@ -443,15 +448,19 @@
         modalTags.appendChild(el("span", { class: "member-tag", text: tag }));
       });
     }
+    // Lock the active panel's scroll so it doesn't scroll behind the modal
+    const panel = getActivePanel();
+    if (panel) panel.style.overflow = "hidden";
     modal.hidden = false;
-    document.body.style.overflow = "";
     $(".modal-close", modal).focus();
   }
 
   function closeModal() {
     const modal = $("#member-modal");
     modal.hidden = true;
-    document.body.style.overflow = "";
+    // Restore active panel scroll
+    const panel = getActivePanel();
+    if (panel) panel.style.overflow = "";
     if (lastFocused) lastFocused.focus();
   }
 
@@ -491,7 +500,8 @@
     "#contact":     "panel-contact",
   };
 
-  let activePanel = "panel-team";
+  const DEFAULT_PANEL = "panel-team";
+  let activePanel = DEFAULT_PANEL;
 
   function updateNavActive() {
     $$(".nav-menu a").forEach((a) => {
@@ -529,9 +539,9 @@
       }
     });
 
-    // Show initial panel based on URL hash or default to team
+    // Show initial panel based on URL hash or default
     const hash = window.location.hash;
-    const initial = (hash && HREF_TO_PANEL[hash]) || "panel-team";
+    const initial = (hash && HREF_TO_PANEL[hash]) || DEFAULT_PANEL;
     showPanel(initial);
   }
 
