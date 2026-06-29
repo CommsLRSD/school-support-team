@@ -1,4 +1,4 @@
-# School &amp; Classroom Support Team (SCST)
+# School & Classroom Support Team (SCST)
 
 An interactive, public-facing web app for the **Louis Riel School Division's School and Classroom Support Team**. It helps the general public and internal staff understand the team's role, the support available, who is responsible for what, and who to contact.
 
