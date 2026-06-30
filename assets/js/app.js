@@ -253,7 +253,8 @@
     const whyWrap = $("#why-highlights");
     if (whyWrap) {
       data.whyItMatters.highlights.forEach((text, i) => {
-        const card = el("div", { class: "highlight-card" });
+        const cardClass = i % 2 === 1 ? "highlight-card highlight-card-dark" : "highlight-card";
+        const card = el("div", { class: cardClass });
         card.appendChild(el("span", { class: "hc-num", text: "0" + (i + 1) }));
         card.appendChild(el("p", { text }));
         whyWrap.appendChild(card);
@@ -265,7 +266,7 @@
     // How we support
     const supportIntro = $("#support-intro");
     if (supportIntro) supportIntro.textContent = data.howWeSupport.intro;
-    listItems($("#support-actions"), data.howWeSupport.actions);
+    listItems($("#support-actions"), data.howWeSupport.actions.slice(0, 4));
 
     // Data
     listItems($("#data-sources"), data.dataSources);
@@ -282,7 +283,8 @@
     const equityWrap = $("#equity-tiers");
     if (equityWrap) {
       data.tiers.forEach((tier, i) => {
-        const card = el("div", { class: "equity-card t" + (i + 1) });
+        const classes = ["equity-card", "t" + (i + 1), i === 1 ? "equity-card-dark" : ""].join(" ").trim();
+        const card = el("div", { class: classes });
         card.appendChild(el("span", { class: "ec-level", text: tier.level }));
         card.appendChild(el("h4", { text: tier.name }));
         card.appendChild(el("p", { text: tier.summary }));
@@ -317,7 +319,10 @@
     const contactWrap = $("#contact-leaders");
     if (contactWrap) {
       data.areas[0].members.slice(0, 3).forEach((m) => {
-        const card = el("div", { class: "contact-card" });
+        const cardClass = m.role.toLowerCase().includes("director")
+          ? "contact-card contact-card-dark"
+          : "contact-card";
+        const card = el("div", { class: cardClass });
         const photo = el("img", {
           class: "contact-photo",
           attrs: { src: "assets/placeholder-headshot.jpg", alt: m.name },
@@ -328,6 +333,59 @@
         contactWrap.appendChild(card);
       });
     }
+  }
+
+  function initFocusCarousels() {
+    $$(".focus-carousel").forEach((wrap, carouselIndex) => {
+      const items = Array.from(wrap.children);
+      if (items.length <= 1) return;
+      if (wrap.dataset.carouselReady === "true") return;
+      wrap.dataset.carouselReady = "true";
+
+      let currentIndex = 0;
+      wrap.classList.add("is-carousel");
+      items.forEach((item, i) => {
+        item.classList.add("carousel-item");
+        item.hidden = i !== currentIndex;
+      });
+
+      const controls = el("div", { class: "focus-carousel-controls" });
+      const prevBtn = el("button", {
+        class: "carousel-btn",
+        text: "Previous",
+        attrs: { type: "button", "aria-label": "Show previous item" },
+      });
+      const status = el("span", { class: "carousel-status", attrs: { "aria-live": "polite" } });
+      const nextBtn = el("button", {
+        class: "carousel-btn",
+        text: "Next",
+        attrs: { type: "button", "aria-label": "Show next item" },
+      });
+
+      function renderCarouselItem() {
+        items.forEach((item, i) => {
+          item.hidden = i !== currentIndex;
+          item.classList.toggle("is-active", i === currentIndex);
+        });
+        status.textContent = `${currentIndex + 1} / ${items.length}`;
+      }
+
+      prevBtn.addEventListener("click", () => {
+        currentIndex = (currentIndex - 1 + items.length) % items.length;
+        renderCarouselItem();
+      });
+      nextBtn.addEventListener("click", () => {
+        currentIndex = (currentIndex + 1) % items.length;
+        renderCarouselItem();
+      });
+
+      controls.appendChild(prevBtn);
+      controls.appendChild(status);
+      controls.appendChild(nextBtn);
+      controls.id = `focus-carousel-controls-${carouselIndex}`;
+      wrap.insertAdjacentElement("afterend", controls);
+      renderCarouselItem();
+    });
   }
 
   /* ──────────────────────────────────────────────────── Tier explorer */
@@ -598,6 +656,7 @@
     renderTiers();
     renderFilters();
     renderTeam();
+    initFocusCarousels();
     wireSearch();
     wireModal();
     wireSidebarToggle();

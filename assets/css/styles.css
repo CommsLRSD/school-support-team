@@ -5,16 +5,16 @@
 
 /* --- Root Variables & Global Styles --- */
 :root {
-  --bg-color: #f8f9fa;
+  --bg-color: #f2f6fb;
   --card-bg: #ffffff;
   --sidebar-bg: #ffffff;
-  --primary-red: #BE5247;
-  --primary-red-light: rgba(190, 82, 71, 0.08);
-  --primary-green: #2BA680;
-  --text-color: #212529;
-  --text-light: #6B7280;
-  --text-lighter: #adb5bd;
-  --border-color: #dee2e6;
+  --primary-red: #315ba6;
+  --primary-red-light: rgba(49, 91, 166, 0.12);
+  --primary-green: #1f8a70;
+  --text-color: #182235;
+  --text-light: #4f627f;
+  --text-lighter: #9aa8be;
+  --border-color: #d5deeb;
   --shadow-sm: 0 1px 2px 0 rgba(0,0,0,.05);
   --shadow: 0 1px 3px 0 rgba(0,0,0,.10), 0 1px 2px 0 rgba(0,0,0,.06);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,.10), 0 2px 4px -1px rgba(0,0,0,.06);
@@ -391,8 +391,27 @@ ul, ol { padding-left: 1.25rem; }
 }
 
 .info-card-accent {
-  background: linear-gradient(135deg, rgba(190,82,71,.06) 0%, rgba(43,166,128,.06) 100%);
-  border-color: rgba(190,82,71,.2);
+  background: linear-gradient(135deg, rgba(49,91,166,.1) 0%, rgba(31,138,112,.1) 100%);
+  border-color: rgba(49,91,166,.26);
+}
+
+.info-card-dark {
+  background: #1f2b45;
+  border-color: #2d3f66;
+}
+
+.info-card-dark h3,
+.info-card-dark p,
+.info-card-dark li {
+  color: #e5ecfa;
+}
+
+.info-card-dark h3 {
+  border-bottom-color: rgba(229,236,250,.25);
+}
+
+.info-card-dark .check-list li::before {
+  background-color: #60a5fa;
 }
 
 /* ─── Panel grids ────────────────────────────────────────────────────────── */
@@ -564,6 +583,14 @@ ul, ol { padding-left: 1.25rem; }
 
 .highlight-card p { font-size: .88rem; color: var(--text-color); margin: 0; }
 
+.highlight-card-dark {
+  background: #1f2b45;
+  border-color: #2d3f66;
+}
+
+.highlight-card-dark p { color: #e5ecfa; }
+.highlight-card-dark .hc-num { color: rgba(147,197,253,.55); }
+
 /* ─── Subhead ────────────────────────────────────────────────────────────── */
 .subhead {
   font-family: var(--font-title);
@@ -685,6 +712,18 @@ ul, ol { padding-left: 1.25rem; }
 .equity-card.t1 { border-top: 3px solid var(--primary-green); }
 .equity-card.t2 { border-top: 3px solid var(--primary-red); }
 .equity-card.t3 { border-top: 3px solid #7c3aed; }
+
+.equity-card-dark {
+  background: #1f2b45;
+  border-color: #2d3f66;
+  border-top-color: #60a5fa !important;
+}
+
+.equity-card-dark .ec-level,
+.equity-card-dark h4,
+.equity-card-dark p {
+  color: #e5ecfa;
+}
 
 .ec-level {
   font-size: .7rem;
@@ -976,6 +1015,16 @@ mark {
   gap: .5rem;
 }
 
+.contact-card-dark {
+  background: #1f2b45;
+  border-color: #2d3f66;
+}
+
+.contact-card-dark .cc-name,
+.contact-card-dark .cc-role {
+  color: #e5ecfa;
+}
+
 .contact-photo {
   width: 80px;
   height: 80px;
@@ -1009,6 +1058,41 @@ mark {
   background: var(--bg-color);
   border-radius: var(--radius);
   border: 1px solid var(--border-color);
+}
+
+.focus-carousel.is-carousel {
+  margin-bottom: .9rem;
+}
+
+.focus-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  margin: 0 0 1.5rem;
+}
+
+.carousel-btn {
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--primary-red);
+  border-radius: 999px;
+  padding: .4rem .9rem;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.carousel-btn:hover {
+  border-color: var(--primary-red);
+  background: var(--primary-red-light);
+}
+
+.carousel-status {
+  font-size: .8rem;
+  color: var(--text-light);
+  min-width: 48px;
+  text-align: center;
 }
 
 /* ─── Looking ahead ──────────────────────────────────────────────────────── */
