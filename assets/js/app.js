@@ -253,7 +253,7 @@
     const whyIntro = $("#why-intro");
     if (whyIntro) whyIntro.textContent = data.whyItMatters.intro;
 
-    const whyWrap = $("#why-highlights");
+    const whyWrap = $("#why-walkthrough");
     if (whyWrap) {
       data.whyItMatters.highlights.forEach((text, i) => {
         const cardClass = i % 2 === 1 ? "highlight-card highlight-card-dark" : "highlight-card";
@@ -262,9 +262,21 @@
         card.appendChild(el("p", { text }));
         whyWrap.appendChild(card);
       });
+
+      const prioritizeCard = el("div", { class: "info-card" });
+      prioritizeCard.appendChild(el("h3", { text: "How we prioritize support" }));
+      const prioritizeList = el("ul", { class: "check-list" });
+      data.whyItMatters.prioritizes.forEach((text) => prioritizeList.appendChild(el("li", { text })));
+      prioritizeCard.appendChild(prioritizeList);
+      whyWrap.appendChild(prioritizeCard);
+
+      const strategicCard = el("div", { class: "info-card info-card-accent" });
+      strategicCard.appendChild(el("h3", { text: "Advancing the Multi-Year Strategic Plan" }));
+      const strategicList = el("ul", { class: "tag-list" });
+      data.whyItMatters.strategicPlan.forEach((text) => strategicList.appendChild(el("li", { text })));
+      strategicCard.appendChild(strategicList);
+      whyWrap.appendChild(strategicCard);
     }
-    listItems($("#why-prioritizes"), data.whyItMatters.prioritizes);
-    listItems($("#why-strategic"),   data.whyItMatters.strategicPlan);
 
     // How we support
     const supportIntro = $("#support-intro");
@@ -293,8 +305,8 @@
     const equityIntro = $("#equity-intro");
     if (equityIntro) equityIntro.textContent = data.schoolBased.equityModelIntro;
 
-    const equityWrap = $("#equity-tiers");
-    if (equityWrap) {
+    const schoolsWalkthrough = $("#schools-walkthrough");
+    if (schoolsWalkthrough) {
       data.tiers.forEach((tier, i) => {
         const classes = ["equity-card", "t" + (i + 1), i === DARK_TIER_INDEX && "equity-card-dark"]
           .filter(Boolean)
@@ -303,24 +315,32 @@
         card.appendChild(el("span", { class: "ec-level", text: tier.level }));
         card.appendChild(el("h4", { text: tier.name }));
         card.appendChild(el("p", { text: tier.summary }));
-        equityWrap.appendChild(card);
+        schoolsWalkthrough.appendChild(card);
       });
-    }
 
-    const embeddedIntro = $("#embedded-intro");
-    if (embeddedIntro) embeddedIntro.textContent = data.schoolBased.embeddedRationale.intro;
-    listItems($("#embedded-factors"), data.schoolBased.embeddedRationale.factors);
+      const embeddedCard = el("div", { class: "info-card" });
+      embeddedCard.appendChild(el("h3", { text: "Embedded Support Rationale" }));
+      embeddedCard.appendChild(
+        el("p", { class: "muted-text", text: data.schoolBased.embeddedRationale.intro })
+      );
+      const embeddedList = el("ul", { class: "check-list" });
+      data.schoolBased.embeddedRationale.factors.forEach((text) =>
+        embeddedList.appendChild(el("li", { text }))
+      );
+      embeddedCard.appendChild(embeddedList);
+      schoolsWalkthrough.appendChild(embeddedCard);
 
-    const dirWrap = $("#current-direction");
-    if (dirWrap) {
+      const directionCard = el("div", { class: "info-card info-card-accent" });
+      directionCard.appendChild(el("h3", { text: "Instructional Support — Current Direction" }));
       data.schoolBased.currentDirection.forEach((block) => {
         const b = el("div", { class: "direction-block" });
         b.appendChild(el("h4", { text: block.title }));
         const ul = el("ul");
         block.points.forEach((p) => ul.appendChild(el("li", { text: p })));
         b.appendChild(ul);
-        dirWrap.appendChild(b);
+        directionCard.appendChild(b);
       });
+      schoolsWalkthrough.appendChild(directionCard);
     }
 
     // Looking ahead
@@ -460,22 +480,7 @@
 
   let activeFilter = "all";
   let activeQuery  = "";
-
-  function buildMemberCard(member) {
-    const card = el("button", { class: "member-card", attrs: { type: "button" } });
-    const photo = el("img", {
-      class: "member-photo",
-      attrs: { src: "assets/placeholder-headshot.jpg", alt: member.name },
-    });
-    card.appendChild(photo);
-    const info = el("div", { class: "member-info" });
-    info.appendChild(el("span", { class: "member-name", html: highlight(member.name, activeQuery) }));
-    info.appendChild(el("span", { class: "member-role", html: highlight(member.role, activeQuery) }));
-    card.appendChild(info);
-    card.appendChild(el("span", { class: "view-bio", text: "View bio →" }));
-    card.addEventListener("click", () => openModal(member));
-    return card;
-  }
+  let activeMemberIndex = 0;
 
   function memberMatches(member) {
     if (!activeQuery) return true;
@@ -483,82 +488,34 @@
     return member.name.toLowerCase().includes(q) || member.role.toLowerCase().includes(q);
   }
 
+  function getFilteredMembers() {
+    return memberIndex.filter(
+      (member) =>
+        (activeFilter === "all" || member.areaId === activeFilter) &&
+        memberMatches(member)
+    );
+  }
+
+  function renderTeamContext(selectedMember) {
+    const context = $("#team-context");
+    if (!context) return;
+    context.innerHTML = "";
+    if (!selectedMember) return;
+    const area = data.areas.find((entry) => entry.id === selectedMember.areaId);
+    if (!area) return;
+
+    const row = el("div", { class: "team-context-row" });
+    row.appendChild(el("p", { class: "team-context-title", text: area.name }));
+    row.appendChild(el("p", { class: "team-context-purpose", text: area.purpose }));
+    context.appendChild(row);
+  }
+
   function renderTeam() {
-    const wrap = $("#team-areas");
-    if (!wrap) return;
-    wrap.innerHTML = "";
-    let visibleCount = 0;
-
-    data.areas.forEach((area) => {
-      if (activeFilter !== "all" && activeFilter !== area.id) return;
-
-      const directMatches  = (area.members || []).filter(memberMatches);
-      const subteamMatches = (area.subteams || [])
-        .map((st) => ({ name: st.name, members: st.members.filter(memberMatches) }))
-        .filter((st) => st.members.length > 0);
-
-      const areaHasMatch = directMatches.length > 0 || subteamMatches.length > 0;
-      if (!areaHasMatch) return;
-
-      visibleCount +=
-        directMatches.length +
-        subteamMatches.reduce((n, st) => n + st.members.length, 0);
-
-      const block = el("div", { class: "area-block reveal", attrs: { id: "area-" + area.id } });
-
-      // Area header
-      const header = el("div", { class: "area-header" });
-      const icon   = el("div", { class: "area-icon", html: ICONS[area.icon] || "" });
-      header.appendChild(icon);
-      const heading = el("div", { class: "area-heading" });
-      const h3 = el("h3");
-      h3.appendChild(el("span", { class: "area-num",  text: area.number + "." }));
-      h3.appendChild(document.createTextNode(" " + area.name + " "));
-      if (area.subtitle) h3.appendChild(el("span", { class: "area-sub", text: "· " + area.subtitle }));
-      heading.appendChild(h3);
-      heading.appendChild(el("p", { class: "area-purpose", text: area.purpose }));
-      header.appendChild(heading);
-      block.appendChild(header);
-
-      // Key work + process (hidden during search to focus on people)
-      if (!activeQuery) {
-        const meta = el("div", { class: "area-meta" });
-        const kw   = el("div", { class: "keywork-card" });
-        kw.appendChild(el("h4", { text: "Key Work" }));
-        const kwList = el("ul", { class: "check-list" });
-        (area.keyWork || []).forEach((t) => kwList.appendChild(el("li", { text: t })));
-        kw.appendChild(kwList);
-        meta.appendChild(kw);
-
-        if (area.process) {
-          const pc = el("div", { class: "process-card" });
-          pc.appendChild(el("h4", { text: area.process.title }));
-          pc.appendChild(el("p", { class: "muted", text: area.process.intro }));
-          const steps = el("ol", { class: "process-steps" });
-          area.process.steps.forEach((s) => steps.appendChild(el("li", { text: s })));
-          pc.appendChild(steps);
-          meta.appendChild(pc);
-        }
-        block.appendChild(meta);
-      }
-
-      // Direct members
-      if (directMatches.length) {
-        const grid = el("div", { class: "member-grid" });
-        directMatches.forEach((m) => grid.appendChild(buildMemberCard(m)));
-        block.appendChild(grid);
-      }
-
-      // Sub-team members
-      subteamMatches.forEach((st) => {
-        block.appendChild(el("p", { class: "subteam-label", text: st.name }));
-        const grid = el("div", { class: "member-grid" });
-        st.members.forEach((m) => grid.appendChild(buildMemberCard(m)));
-        block.appendChild(grid);
-      });
-
-      wrap.appendChild(block);
-    });
+    const stage = $("#team-member-stage");
+    if (!stage) return;
+    stage.innerHTML = "";
+    const visibleMembers = getFilteredMembers();
+    const visibleCount = visibleMembers.length;
 
     // Results count + empty state
     const noResults = $("#no-results");
@@ -566,18 +523,108 @@
     if (visibleCount === 0) {
       if (noResults) noResults.hidden = false;
       if (countEl)   countEl.textContent = "";
-    } else {
-      if (noResults) noResults.hidden = true;
-      if (countEl) {
-        const label =
-          activeQuery || activeFilter !== "all"
-            ? `Showing ${visibleCount} team member${visibleCount === 1 ? "" : "s"}`
-            : `${visibleCount} team members across ${data.areas.length} areas of support`;
-        countEl.textContent = label;
-      }
+      renderTeamContext(null);
+      return;
+    }
+    if (noResults) noResults.hidden = true;
+
+    if (activeMemberIndex > visibleMembers.length - 1) {
+      activeMemberIndex = visibleMembers.length - 1;
+    }
+    if (activeMemberIndex < 0) activeMemberIndex = 0;
+    const selectedMember = visibleMembers[activeMemberIndex];
+    renderTeamContext(selectedMember);
+
+    if (countEl) {
+      const label =
+        activeQuery || activeFilter !== "all"
+          ? `Showing ${visibleCount} team member${visibleCount === 1 ? "" : "s"}`
+          : `${visibleCount} team members across ${data.areas.length} areas of support`;
+      countEl.textContent = label;
     }
 
-    observeReveals();
+    const selector = el("div", {
+      class: "member-selector-strip",
+      attrs: { role: "tablist", "aria-label": "Choose a team member" },
+    });
+    visibleMembers.forEach((member, index) => {
+      const chip = el("button", {
+        class: "member-chip" + (index === activeMemberIndex ? " is-active" : ""),
+        html: highlight(member.name, activeQuery),
+        attrs: {
+          type: "button",
+          role: "tab",
+          "aria-selected": index === activeMemberIndex ? "true" : "false",
+        },
+      });
+      chip.addEventListener("click", () => {
+        activeMemberIndex = index;
+        renderTeam();
+      });
+      selector.appendChild(chip);
+    });
+    stage.appendChild(selector);
+
+    const focusCard = el("article", { class: "team-focus-card" });
+    const focusHeader = el("div", { class: "team-focus-head" });
+    const photo = el("img", {
+      class: "team-focus-photo",
+      attrs: { src: "assets/placeholder-headshot.jpg", alt: selectedMember.name },
+    });
+    focusHeader.appendChild(photo);
+    const focusInfo = el("div", { class: "team-focus-info" });
+    focusInfo.appendChild(el("h3", { html: highlight(selectedMember.name, activeQuery) }));
+    focusInfo.appendChild(el("p", { class: "team-focus-role", html: highlight(selectedMember.role, activeQuery) }));
+    const areaLabel = selectedMember.areaName + (selectedMember.subteam ? " · " + selectedMember.subteam : "");
+    focusInfo.appendChild(el("p", { class: "team-focus-area", text: areaLabel }));
+    focusHeader.appendChild(focusInfo);
+    focusCard.appendChild(focusHeader);
+    focusCard.appendChild(el("p", { class: "team-focus-bio", text: selectedMember.bio }));
+
+    const actions = el("div", { class: "team-focus-actions" });
+    const prevBtn = el("button", {
+      class: "team-pager-btn",
+      text: "Previous",
+      attrs: { type: "button", "aria-label": "Show previous team member" },
+    });
+    prevBtn.disabled = activeMemberIndex === 0;
+    prevBtn.addEventListener("click", () => {
+      if (activeMemberIndex === 0) return;
+      activeMemberIndex -= 1;
+      renderTeam();
+    });
+
+    const status = el("span", {
+      class: "team-pager-status",
+      text: `${activeMemberIndex + 1} / ${visibleMembers.length}`,
+      attrs: { "aria-live": "polite" },
+    });
+
+    const nextBtn = el("button", {
+      class: "team-pager-btn",
+      text: "Next",
+      attrs: { type: "button", "aria-label": "Show next team member" },
+    });
+    nextBtn.disabled = activeMemberIndex === visibleMembers.length - 1;
+    nextBtn.addEventListener("click", () => {
+      if (activeMemberIndex === visibleMembers.length - 1) return;
+      activeMemberIndex += 1;
+      renderTeam();
+    });
+
+    const bioBtn = el("button", {
+      class: "team-bio-btn",
+      text: "Open full bio",
+      attrs: { type: "button" },
+    });
+    bioBtn.addEventListener("click", () => openModal(selectedMember));
+
+    actions.appendChild(prevBtn);
+    actions.appendChild(status);
+    actions.appendChild(nextBtn);
+    actions.appendChild(bioBtn);
+    focusCard.appendChild(actions);
+    stage.appendChild(focusCard);
   }
 
   function renderFilters() {
@@ -594,6 +641,7 @@
       });
       chip.addEventListener("click", () => {
         activeFilter = f.id;
+        activeMemberIndex = 0;
         $$(".chip", wrap).forEach((c) =>
           c.setAttribute("aria-pressed", c === chip ? "true" : "false")
         );
@@ -611,6 +659,7 @@
       clearTimeout(timer);
       timer = setTimeout(() => {
         activeQuery = input.value.trim();
+        activeMemberIndex = 0;
         renderTeam();
       }, 120);
     });
