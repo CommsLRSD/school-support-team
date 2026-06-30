@@ -377,7 +377,7 @@ ul, ol { padding-left: 1.25rem; }
 
 .info-card:hover {
   box-shadow: var(--shadow-md);
-  border-color: rgba(190, 82, 71, .25);
+  border-color: rgba(49, 91, 166, .25);
 }
 
 .info-card h3 {
@@ -483,7 +483,7 @@ ul, ol { padding-left: 1.25rem; }
 .tag-list li {
   display: inline-block;
   padding: .3rem .75rem;
-  background: rgba(190,82,71,.1);
+  background: rgba(49, 91, 166, .12);
   color: var(--primary-accent);
   border-radius: 999px;
   font-size: .8rem;
@@ -519,7 +519,7 @@ ul, ol { padding-left: 1.25rem; }
 
 /* ─── Lead callout ───────────────────────────────────────────────────────── */
 .lead-callout {
-  background: linear-gradient(135deg, rgba(190,82,71,.08) 0%, rgba(43,166,128,.08) 100%);
+  background: linear-gradient(135deg, rgba(49, 91, 166, .1) 0%, rgba(31, 138, 112, .1) 100%);
   border-left: 4px solid var(--primary-accent);
   border-radius: 0 var(--radius) var(--radius) 0;
   padding: 1.25rem 1.5rem;
@@ -575,7 +575,7 @@ ul, ol { padding-left: 1.25rem; }
 
 .highlight-card:hover {
   box-shadow: var(--shadow-md);
-  border-color: rgba(190,82,71,.25);
+  border-color: rgba(49, 91, 166, .25);
 }
 
 .hc-num {
@@ -583,7 +583,7 @@ ul, ol { padding-left: 1.25rem; }
   font-family: var(--font-title);
   font-size: 2rem;
   font-weight: 700;
-  color: rgba(190,82,71,.25);
+  color: rgba(49, 91, 166, .28);
   line-height: 1;
   margin-bottom: .5rem;
 }
@@ -643,12 +643,12 @@ ul, ol { padding-left: 1.25rem; }
 
 .tier-tab:hover {
   border-color: var(--primary-accent);
-  background: rgba(190,82,71,.04);
+  background: rgba(49, 91, 166, .06);
 }
 
 .tier-tab[aria-selected="true"] {
   border-color: var(--primary-accent);
-  background: rgba(190,82,71,.08);
+  background: rgba(49, 91, 166, .1);
   box-shadow: var(--shadow-md);
 }
 
@@ -808,7 +808,7 @@ ul, ol { padding-left: 1.25rem; }
 
 .search-field input:focus {
   border-color: var(--primary-accent);
-  box-shadow: 0 0 0 3px rgba(190,82,71,.12);
+  box-shadow: 0 0 0 3px rgba(49, 91, 166, .18);
 }
 
 .filter-chips {
@@ -1008,7 +1008,7 @@ ul, ol { padding-left: 1.25rem; }
 }
 
 mark {
-  background: rgba(190,82,71,.18);
+  background: rgba(49, 91, 166, .2);
   color: var(--text-color);
   border-radius: 3px;
 }
@@ -1202,7 +1202,7 @@ mark {
 .modal-area {
   display: inline-block;
   padding: .2rem .65rem;
-  background: rgba(190,82,71,.1);
+  background: rgba(49, 91, 166, .14);
   color: var(--primary-accent);
   border-radius: 999px;
   font-size: .75rem;

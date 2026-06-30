@@ -12,7 +12,7 @@
   const data = window.SCST;
   const MAX_SUPPORT_ACTIONS = 4;
   const DARK_TIER_INDEX = 1;
-  const EMPHASIS_ROLE_MATCH = /director/i;
+  const DIRECTOR_ROLE_PATTERN = /director/i;
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
@@ -296,7 +296,9 @@
     const equityWrap = $("#equity-tiers");
     if (equityWrap) {
       data.tiers.forEach((tier, i) => {
-        const classes = ["equity-card", "t" + (i + 1), i === DARK_TIER_INDEX ? "equity-card-dark" : ""].join(" ").trim();
+        const classes = ["equity-card", "t" + (i + 1), i === DARK_TIER_INDEX && "equity-card-dark"]
+          .filter(Boolean)
+          .join(" ");
         const card = el("div", { class: classes });
         card.appendChild(el("span", { class: "ec-level", text: tier.level }));
         card.appendChild(el("h4", { text: tier.name }));
@@ -332,7 +334,7 @@
     const contactWrap = $("#contact-leaders");
     if (contactWrap) {
       data.areas[0].members.slice(0, 3).forEach((m) => {
-        const cardClass = EMPHASIS_ROLE_MATCH.test(m.role)
+        const cardClass = DIRECTOR_ROLE_PATTERN.test(m.role)
           ? "contact-card contact-card-dark"
           : "contact-card";
         const card = el("div", { class: cardClass });
@@ -359,7 +361,11 @@
       wrap.classList.add("is-carousel");
       items.forEach((item, i) => {
         item.classList.add("carousel-item");
-        item.setAttribute("aria-label", `Card ${i + 1} of ${items.length}`);
+        const itemSummaryNode = item.querySelector("h3, h4, .cc-name, p");
+        const itemSummary = itemSummaryNode
+          ? itemSummaryNode.textContent.trim().slice(0, 80)
+          : "highlight";
+        item.setAttribute("aria-label", `Card ${i + 1} of ${items.length}: ${itemSummary}`);
         item.hidden = i !== currentIndex;
       });
       wrap.setAttribute("role", "region");
