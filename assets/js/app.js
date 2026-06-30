@@ -1,7 +1,8 @@
 /*
- * Interactivity for the School & Classroom Support Team web app.
- * Renders content from data.js and wires up navigation, the tier explorer,
- * team search/filter, member bio modals, and scroll behaviours.
+ * Interactivity for the School & Classroom Support Team dashboard.
+ * Renders content from data.js, handles panel navigation, sidebar toggle,
+ * tier explorer, team search/filter, member bio modals, and prev/next
+ * "slideshow" navigation through sections.
  *
  * No build step or framework required — plain, dependency-free JavaScript.
  */
@@ -12,9 +13,8 @@
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-  /* ---------------------------------------------------------- Utilities */
+  /* ─────────────────────────────────────────────────────────── Utilities */
 
-  // Build an element with optional class, text and attributes.
   function el(tag, opts = {}) {
     const node = document.createElement(tag);
     if (opts.class) node.className = opts.class;
@@ -26,53 +26,18 @@
     return node;
   }
 
-  function listItems(parent, items, className) {
+  function listItems(parent, items) {
     if (!parent) return;
     parent.innerHTML = "";
-    items.forEach((text) => parent.appendChild(el("li", { text, class: className })));
+    items.forEach((text) => parent.appendChild(el("li", { text })));
   }
 
-  // Two-letter initials for avatars.
-  function initials(name) {
-    const parts = name.trim().split(/\s+/);
-    const first = parts[0] ? parts[0][0] : "";
-    const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
-    return (first + last).toUpperCase();
-  }
-
-  // Deterministic accent colour per person so avatars are stable & varied.
-  const AVATAR_COLORS = [
-    "#1f8a8a",
-    "#0f2a43",
-    "#c0593f",
-    "#7a5a13",
-    "#2f6f4e",
-    "#6a4a86",
-    "#b3791f",
-    "#356b9a",
-  ];
-  function avatarColor(name) {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = (hash * 31 + name.charCodeAt(i)) % 100000;
-    }
-    return AVATAR_COLORS[hash % AVATAR_COLORS.length];
-  }
-
-  function makeAvatar(name) {
-    const a = el("span", { class: "avatar", text: initials(name) });
-    a.style.background = avatarColor(name);
-    return a;
-  }
-
-  // Escape user-derived text before injecting as HTML (for highlight).
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, (c) =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
     );
   }
 
-  // Wrap matched query text in <mark>. Both inputs are plain text.
   function highlight(text, query) {
     const safe = escapeHtml(text);
     if (!query) return safe;
@@ -80,7 +45,7 @@
     return safe.replace(new RegExp("(" + escapedQuery + ")", "gi"), "<mark>$1</mark>");
   }
 
-  // Inline SVG icons keyed by name.
+  // Inline SVG icons keyed by area id.
   const ICONS = {
     compass:
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="16 8 14 14 8 16 10 10 16 8"/></svg>',
@@ -96,8 +61,149 @@
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9.3 16.5 13.8 18.5 21 12 17 5.5 21 7.5 13.8 2 9.3 9 9 12 2"/></svg>',
   };
 
-  /* --------------------------------------------------- Flatten members */
-  // Build a flat list of every member with their area context, for search.
+  /* ─────────────────────────────────────────── Section navigation (panels) */
+
+  const SECTIONS = [
+    { id: "overview", panel: "panel-overview" },
+    { id: "why",      panel: "panel-why"      },
+    { id: "support",  panel: "panel-support"  },
+    { id: "data",     panel: "panel-data"     },
+    { id: "team",     panel: "panel-team"     },
+    { id: "schools",  panel: "panel-schools"  },
+    { id: "ahead",    panel: "panel-ahead"    },
+    { id: "contact",  panel: "panel-contact"  },
+  ];
+
+  let currentSectionIndex = 0;
+
+  function showSection(index) {
+    if (index < 0 || index >= SECTIONS.length) return;
+    currentSectionIndex = index;
+    const section = SECTIONS[index];
+
+    // Show/hide panels
+    SECTIONS.forEach(({ panel }) => {
+      const el = $("#" + panel);
+      if (el) el.hidden = true;
+    });
+    const activePanel = $("#" + section.panel);
+    if (activePanel) {
+      activePanel.hidden = false;
+      // Re-trigger entrance animation by resetting
+      activePanel.style.animation = "none";
+      activePanel.offsetHeight; // reflow
+      activePanel.style.animation = "";
+    }
+
+    // Update sidebar nav active state
+    $$(".nav-list-item").forEach((link) => {
+      const isActive = link.dataset.section === section.id;
+      link.classList.toggle("active", isActive);
+      link.setAttribute("aria-current", isActive ? "page" : "false");
+    });
+
+    // Update prev/next buttons and counter
+    const prevBtn = $("#prev-btn");
+    const nextBtn = $("#next-btn");
+    const counter = $("#pag-counter");
+
+    if (prevBtn) prevBtn.disabled = index === 0;
+    if (nextBtn) nextBtn.disabled = index === SECTIONS.length - 1;
+    if (counter) counter.textContent = (index + 1) + " / " + SECTIONS.length;
+
+    // If navigating to the team panel, trigger reveal observers
+    if (section.id === "team") {
+      setTimeout(observeReveals, 50);
+    }
+
+    // Scroll the main content to top
+    const body = $(".content-body");
+    if (body) body.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function wireNavigation() {
+    // Sidebar nav links
+    $$(".nav-list-item").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const sectionId = link.dataset.section;
+        const idx = SECTIONS.findIndex((s) => s.id === sectionId);
+        if (idx !== -1) {
+          showSection(idx);
+          closeSidebar(); // close on mobile
+        }
+      });
+    });
+
+    // Prev / Next buttons
+    const prevBtn = $("#prev-btn");
+    const nextBtn = $("#next-btn");
+
+    if (prevBtn) prevBtn.addEventListener("click", () => showSection(currentSectionIndex - 1));
+    if (nextBtn) nextBtn.addEventListener("click", () => showSection(currentSectionIndex + 1));
+
+    // Keyboard shortcut: left/right arrow keys when not focused in inputs
+    document.addEventListener("keydown", (e) => {
+      const tag = document.activeElement.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (e.key === "ArrowRight") showSection(currentSectionIndex + 1);
+      if (e.key === "ArrowLeft")  showSection(currentSectionIndex - 1);
+    });
+  }
+
+  /* ─────────────────────────────────────────────── Mobile sidebar toggle */
+
+  function openSidebar() {
+    const sidebar  = $("#sidebar");
+    const overlay  = $("#sidebar-overlay");
+    const toggleBtn = $("#sidebar-toggle-btn");
+    if (sidebar)  sidebar.classList.add("open");
+    if (overlay)  overlay.classList.add("open");
+    if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeSidebar() {
+    const sidebar  = $("#sidebar");
+    const overlay  = $("#sidebar-overlay");
+    const toggleBtn = $("#sidebar-toggle-btn");
+    if (sidebar)  sidebar.classList.remove("open");
+    if (overlay)  overlay.classList.remove("open");
+    if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  }
+
+  function wireSidebarToggle() {
+    const toggleBtn = $("#sidebar-toggle-btn");
+    const overlay   = $("#sidebar-overlay");
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", () => {
+        const sidebar = $("#sidebar");
+        if (sidebar && sidebar.classList.contains("open")) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      });
+    }
+
+    if (overlay) {
+      overlay.addEventListener("click", closeSidebar);
+    }
+
+    // Close sidebar on Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const sidebar = $("#sidebar");
+        if (sidebar && sidebar.classList.contains("open")) closeSidebar();
+      }
+    });
+  }
+
+  /* ─────────────────────────────────────────────────── Flatten members */
+
   function buildMemberIndex() {
     const list = [];
     data.areas.forEach((area) => {
@@ -112,46 +218,53 @@
   }
   const memberIndex = buildMemberIndex();
 
-  /* ------------------------------------------------------ Static content */
-  function renderStaticContent() {
-    $("#hero-tagline").textContent = data.org.tagline;
-    $("#footer-tagline").textContent = data.org.tagline;
+  /* ──────────────────────────────────────────────────── Static content */
 
-    // Hero stats
+  function renderStaticContent() {
+    // Who we are
+    const whoIntro = $("#who-intro");
+    if (whoIntro) whoIntro.textContent = data.whoWeAre.intro;
+    listItems($("#grounded-in"),    data.whoWeAre.groundedIn);
+    listItems($("#work-alongside"), data.whoWeAre.workAlongside);
+    const whoSummary = $("#who-summary");
+    if (whoSummary) whoSummary.textContent = data.whoWeAre.summary;
+
+    // Stats
     const totalMembers = memberIndex.length;
     const stats = [
-      { n: data.areas.length, label: "Areas of support" },
-      { n: totalMembers, label: "Team members" },
-      { n: data.tiers.length, label: "Tiers of support" },
+      { n: data.areas.length,   label: "Areas of support" },
+      { n: totalMembers,        label: "Team members"      },
+      { n: data.tiers.length,   label: "Tiers of support"  },
     ];
     const statsWrap = $("#hero-stats");
-    stats.forEach((s) => {
-      const d = el("div");
-      d.appendChild(el("dt", { text: String(s.n) }));
-      d.appendChild(el("dd", { text: s.label }));
-      statsWrap.appendChild(d);
-    });
-
-    // Who we are
-    $("#who-intro").textContent = data.whoWeAre.intro;
-    listItems($("#grounded-in"), data.whoWeAre.groundedIn);
-    listItems($("#work-alongside"), data.whoWeAre.workAlongside);
-    $("#who-summary").textContent = data.whoWeAre.summary;
+    if (statsWrap) {
+      stats.forEach((s) => {
+        const div = el("div");
+        div.appendChild(el("dt", { text: String(s.n) }));
+        div.appendChild(el("dd", { text: s.label }));
+        statsWrap.appendChild(div);
+      });
+    }
 
     // Why it matters
-    $("#why-intro").textContent = data.whyItMatters.intro;
+    const whyIntro = $("#why-intro");
+    if (whyIntro) whyIntro.textContent = data.whyItMatters.intro;
+
     const whyWrap = $("#why-highlights");
-    data.whyItMatters.highlights.forEach((text, i) => {
-      const card = el("div", { class: "highlight-card" });
-      card.appendChild(el("span", { class: "hc-num", text: "0" + (i + 1) }));
-      card.appendChild(el("p", { text }));
-      whyWrap.appendChild(card);
-    });
+    if (whyWrap) {
+      data.whyItMatters.highlights.forEach((text, i) => {
+        const card = el("div", { class: "highlight-card" });
+        card.appendChild(el("span", { class: "hc-num", text: "0" + (i + 1) }));
+        card.appendChild(el("p", { text }));
+        whyWrap.appendChild(card);
+      });
+    }
     listItems($("#why-prioritizes"), data.whyItMatters.prioritizes);
-    listItems($("#why-strategic"), data.whyItMatters.strategicPlan);
+    listItems($("#why-strategic"),   data.whyItMatters.strategicPlan);
 
     // How we support
-    $("#support-intro").textContent = data.howWeSupport.intro;
+    const supportIntro = $("#support-intro");
+    if (supportIntro) supportIntro.textContent = data.howWeSupport.intro;
     listItems($("#support-actions"), data.howWeSupport.actions);
 
     // Data
@@ -160,57 +273,75 @@
 
     // School-based support
     const sbIntro = $("#school-based-intro");
-    data.schoolBased.intro.forEach((p) => sbIntro.appendChild(el("p", { text: p })));
-    $("#equity-intro").textContent = data.schoolBased.equityModelIntro;
+    if (sbIntro) {
+      data.schoolBased.intro.forEach((p) => sbIntro.appendChild(el("p", { text: p })));
+    }
+    const equityIntro = $("#equity-intro");
+    if (equityIntro) equityIntro.textContent = data.schoolBased.equityModelIntro;
 
     const equityWrap = $("#equity-tiers");
-    data.tiers.forEach((tier, i) => {
-      const card = el("div", { class: "equity-card t" + (i + 1) });
-      card.appendChild(el("span", { class: "ec-level", text: tier.level }));
-      card.appendChild(el("h4", { text: tier.name }));
-      card.appendChild(el("p", { text: tier.summary }));
-      equityWrap.appendChild(card);
-    });
+    if (equityWrap) {
+      data.tiers.forEach((tier, i) => {
+        const card = el("div", { class: "equity-card t" + (i + 1) });
+        card.appendChild(el("span", { class: "ec-level", text: tier.level }));
+        card.appendChild(el("h4", { text: tier.name }));
+        card.appendChild(el("p", { text: tier.summary }));
+        equityWrap.appendChild(card);
+      });
+    }
 
-    $("#embedded-intro").textContent = data.schoolBased.embeddedRationale.intro;
+    const embeddedIntro = $("#embedded-intro");
+    if (embeddedIntro) embeddedIntro.textContent = data.schoolBased.embeddedRationale.intro;
     listItems($("#embedded-factors"), data.schoolBased.embeddedRationale.factors);
 
     const dirWrap = $("#current-direction");
-    data.schoolBased.currentDirection.forEach((block) => {
-      const b = el("div", { class: "direction-block" });
-      b.appendChild(el("h4", { text: block.title }));
-      const ul = el("ul");
-      block.points.forEach((p) => ul.appendChild(el("li", { text: p })));
-      b.appendChild(ul);
-      dirWrap.appendChild(b);
-    });
+    if (dirWrap) {
+      data.schoolBased.currentDirection.forEach((block) => {
+        const b = el("div", { class: "direction-block" });
+        b.appendChild(el("h4", { text: block.title }));
+        const ul = el("ul");
+        block.points.forEach((p) => ul.appendChild(el("li", { text: p })));
+        b.appendChild(ul);
+        dirWrap.appendChild(b);
+      });
+    }
 
     // Looking ahead
-    $("#ahead-intro").textContent = data.lookingAhead.intro;
+    const aheadIntro = $("#ahead-intro");
+    if (aheadIntro) aheadIntro.textContent = data.lookingAhead.intro;
     listItems($("#ahead-points"), data.lookingAhead.points);
-    $("#ahead-mentorship").textContent = data.lookingAhead.mentorship;
+    const aheadMentorship = $("#ahead-mentorship");
+    if (aheadMentorship) aheadMentorship.textContent = data.lookingAhead.mentorship;
 
-    // Contact — leadership team
+    // Contact — leadership team (first 3 leaders)
     const contactWrap = $("#contact-leaders");
-    data.areas[0].members.slice(0, 3).forEach((m) => {
-      const card = el("div", { class: "contact-card" });
-      card.appendChild(makeAvatar(m.name));
-      card.appendChild(el("p", { class: "cc-name", text: m.name }));
-      card.appendChild(el("p", { class: "cc-role", text: m.role }));
-      contactWrap.appendChild(card);
-    });
+    if (contactWrap) {
+      data.areas[0].members.slice(0, 3).forEach((m) => {
+        const card = el("div", { class: "contact-card" });
+        const photo = el("img", {
+          class: "contact-photo",
+          attrs: { src: "assets/placeholder-headshot.jpg", alt: m.name },
+        });
+        card.appendChild(photo);
+        card.appendChild(el("p", { class: "cc-name", text: m.name }));
+        card.appendChild(el("p", { class: "cc-role", text: m.role }));
+        contactWrap.appendChild(card);
+      });
+    }
   }
 
-  /* -------------------------------------------------------- Tier explorer */
+  /* ──────────────────────────────────────────────────── Tier explorer */
+
   function renderTiers() {
-    const tabs = $("#tier-tabs");
+    const tabs  = $("#tier-tabs");
     const panel = $("#tier-panel");
+    if (!tabs || !panel) return;
 
     function showTier(tier) {
       panel.innerHTML = "";
       panel.appendChild(el("span", { class: "tp-badge", text: tier.level }));
-      panel.appendChild(el("h3", { text: tier.name }));
-      panel.appendChild(el("p", { class: "tp-summary", text: tier.summary }));
+      panel.appendChild(el("h3",   { text: tier.name }));
+      panel.appendChild(el("p",    { class: "tp-summary", text: tier.summary }));
       const ul = el("ul", { class: "check-list" });
       tier.includes.forEach((t) => ul.appendChild(el("li", { text: t })));
       panel.appendChild(ul);
@@ -220,18 +351,12 @@
     data.tiers.forEach((tier, i) => {
       const tab = el("button", {
         class: "tier-tab",
-        attrs: {
-          role: "tab",
-          "aria-selected": i === 0 ? "true" : "false",
-          type: "button",
-        },
+        attrs: { role: "tab", "aria-selected": i === 0 ? "true" : "false", type: "button" },
       });
       tab.appendChild(el("span", { class: "tt-level", text: tier.level }));
-      tab.appendChild(el("span", { class: "tt-name", text: tier.name }));
+      tab.appendChild(el("span", { class: "tt-name",  text: tier.name  }));
       tab.addEventListener("click", () => {
-        $$(".tier-tab", tabs).forEach((t) =>
-          t.setAttribute("aria-selected", "false")
-        );
+        $$(".tier-tab", tabs).forEach((t) => t.setAttribute("aria-selected", "false"));
         tab.setAttribute("aria-selected", "true");
         showTier(tier);
       });
@@ -241,23 +366,21 @@
     showTier(data.tiers[0]);
   }
 
-  /* ----------------------------------------------------------- Team areas */
+  /* ──────────────────────────────────────────────────── Team areas */
+
   let activeFilter = "all";
-  let activeQuery = "";
+  let activeQuery  = "";
 
   function buildMemberCard(member) {
-    const card = el("button", {
-      class: "member-card",
-      attrs: { type: "button" },
+    const card = el("button", { class: "member-card", attrs: { type: "button" } });
+    const photo = el("img", {
+      class: "member-photo",
+      attrs: { src: "assets/placeholder-headshot.jpg", alt: member.name },
     });
-    card.appendChild(makeAvatar(member.name));
+    card.appendChild(photo);
     const info = el("div", { class: "member-info" });
-    info.appendChild(
-      el("span", { class: "member-name", html: highlight(member.name, activeQuery) })
-    );
-    info.appendChild(
-      el("span", { class: "member-role", html: highlight(member.role, activeQuery) })
-    );
+    info.appendChild(el("span", { class: "member-name", html: highlight(member.name, activeQuery) }));
+    info.appendChild(el("span", { class: "member-role", html: highlight(member.role, activeQuery) }));
     card.appendChild(info);
     card.appendChild(el("span", { class: "view-bio", text: "View bio →" }));
     card.addEventListener("click", () => openModal(member));
@@ -267,64 +390,53 @@
   function memberMatches(member) {
     if (!activeQuery) return true;
     const q = activeQuery.toLowerCase();
-    return (
-      member.name.toLowerCase().includes(q) ||
-      member.role.toLowerCase().includes(q)
-    );
+    return member.name.toLowerCase().includes(q) || member.role.toLowerCase().includes(q);
   }
 
   function renderTeam() {
     const wrap = $("#team-areas");
+    if (!wrap) return;
     wrap.innerHTML = "";
     let visibleCount = 0;
 
     data.areas.forEach((area) => {
       if (activeFilter !== "all" && activeFilter !== area.id) return;
 
-      // Gather matching members (including sub-teams).
-      const directMatches = (area.members || []).filter(memberMatches);
+      const directMatches  = (area.members || []).filter(memberMatches);
       const subteamMatches = (area.subteams || [])
         .map((st) => ({ name: st.name, members: st.members.filter(memberMatches) }))
         .filter((st) => st.members.length > 0);
 
-      const areaHasMatch =
-        directMatches.length > 0 || subteamMatches.length > 0;
+      const areaHasMatch = directMatches.length > 0 || subteamMatches.length > 0;
       if (!areaHasMatch) return;
 
       visibleCount +=
         directMatches.length +
         subteamMatches.reduce((n, st) => n + st.members.length, 0);
 
-      const block = el("div", {
-        class: "area-block reveal",
-        attrs: { id: "area-" + area.id },
-      });
+      const block = el("div", { class: "area-block reveal", attrs: { id: "area-" + area.id } });
 
-      // Header
+      // Area header
       const header = el("div", { class: "area-header" });
-      const icon = el("div", { class: "area-icon", html: ICONS[area.icon] || "" });
+      const icon   = el("div", { class: "area-icon", html: ICONS[area.icon] || "" });
       header.appendChild(icon);
       const heading = el("div", { class: "area-heading" });
       const h3 = el("h3");
-      h3.appendChild(el("span", { class: "area-num", text: area.number + "." }));
+      h3.appendChild(el("span", { class: "area-num",  text: area.number + "." }));
       h3.appendChild(document.createTextNode(" " + area.name + " "));
-      if (area.subtitle) {
-        h3.appendChild(el("span", { class: "area-sub", text: "· " + area.subtitle }));
-      }
+      if (area.subtitle) h3.appendChild(el("span", { class: "area-sub", text: "· " + area.subtitle }));
       heading.appendChild(h3);
       heading.appendChild(el("p", { class: "area-purpose", text: area.purpose }));
       header.appendChild(heading);
       block.appendChild(header);
 
-      // Key work + process (hidden while searching to focus on people)
+      // Key work + process (hidden during search to focus on people)
       if (!activeQuery) {
         const meta = el("div", { class: "area-meta" });
-        const kw = el("div", { class: "keywork-card" });
+        const kw   = el("div", { class: "keywork-card" });
         kw.appendChild(el("h4", { text: "Key Work" }));
         const kwList = el("ul", { class: "check-list" });
-        (area.keyWork || []).forEach((t) =>
-          kwList.appendChild(el("li", { text: t }))
-        );
+        (area.keyWork || []).forEach((t) => kwList.appendChild(el("li", { text: t })));
         kw.appendChild(kwList);
         meta.appendChild(kw);
 
@@ -333,9 +445,7 @@
           pc.appendChild(el("h4", { text: area.process.title }));
           pc.appendChild(el("p", { class: "muted", text: area.process.intro }));
           const steps = el("ol", { class: "process-steps" });
-          area.process.steps.forEach((s) =>
-            steps.appendChild(el("li", { text: s }))
-          );
+          area.process.steps.forEach((s) => steps.appendChild(el("li", { text: s })));
           pc.appendChild(steps);
           meta.appendChild(pc);
         }
@@ -362,17 +472,19 @@
 
     // Results count + empty state
     const noResults = $("#no-results");
-    const countEl = $("#results-count");
+    const countEl   = $("#results-count");
     if (visibleCount === 0) {
-      noResults.hidden = false;
-      countEl.textContent = "";
+      if (noResults) noResults.hidden = false;
+      if (countEl)   countEl.textContent = "";
     } else {
-      noResults.hidden = true;
-      const label =
-        activeQuery || activeFilter !== "all"
-          ? `Showing ${visibleCount} team member${visibleCount === 1 ? "" : "s"}`
-          : `${visibleCount} team members across ${data.areas.length} areas of support`;
-      countEl.textContent = label;
+      if (noResults) noResults.hidden = true;
+      if (countEl) {
+        const label =
+          activeQuery || activeFilter !== "all"
+            ? `Showing ${visibleCount} team member${visibleCount === 1 ? "" : "s"}`
+            : `${visibleCount} team members across ${data.areas.length} areas of support`;
+        countEl.textContent = label;
+      }
     }
 
     observeReveals();
@@ -380,6 +492,7 @@
 
   function renderFilters() {
     const wrap = $("#area-filters");
+    if (!wrap) return;
     const filters = [{ id: "all", name: "All areas" }].concat(
       data.areas.map((a) => ({ id: a.id, name: a.name }))
     );
@@ -387,11 +500,7 @@
       const chip = el("button", {
         class: "chip",
         text: f.name,
-        attrs: {
-          type: "button",
-          "aria-pressed": f.id === "all" ? "true" : "false",
-          "data-filter": f.id,
-        },
+        attrs: { type: "button", "aria-pressed": f.id === "all" ? "true" : "false", "data-filter": f.id },
       });
       chip.addEventListener("click", () => {
         activeFilter = f.id;
@@ -406,6 +515,7 @@
 
   function wireSearch() {
     const input = $("#team-search");
+    if (!input) return;
     let timer;
     input.addEventListener("input", () => {
       clearTimeout(timer);
@@ -416,20 +526,24 @@
     });
   }
 
-  /* --------------------------------------------------------------- Modal */
+  /* ──────────────────────────────────────────────────── Modal */
+
   let lastFocused = null;
+
   function openModal(member) {
     lastFocused = document.activeElement;
     const modal = $("#member-modal");
-    const avatar = $("#modal-avatar");
-    avatar.textContent = initials(member.name);
-    avatar.style.background = avatarColor(member.name);
+    if (!modal) return;
+    const photo = $("#modal-photo");
+    if (photo) {
+      photo.src = "assets/placeholder-headshot.jpg";
+      photo.alt = member.name;
+    }
     $("#modal-name").textContent = member.name;
     $("#modal-role").textContent = member.role;
-    const areaLabel =
-      member.areaName + (member.subteam ? " · " + member.subteam : "");
+    const areaLabel = member.areaName + (member.subteam ? " · " + member.subteam : "");
     $("#modal-area").textContent = areaLabel;
-    $("#modal-bio").textContent = member.bio;
+    $("#modal-bio").textContent  = member.bio;
     modal.hidden = false;
     document.body.style.overflow = "hidden";
     $(".modal-close", modal).focus();
@@ -437,6 +551,7 @@
 
   function closeModal() {
     const modal = $("#member-modal");
+    if (!modal) return;
     modal.hidden = true;
     document.body.style.overflow = "";
     if (lastFocused) lastFocused.focus();
@@ -444,6 +559,7 @@
 
   function wireModal() {
     const modal = $("#member-modal");
+    if (!modal) return;
     modal.addEventListener("click", (e) => {
       if (e.target.hasAttribute("data-close")) closeModal();
     });
@@ -452,53 +568,10 @@
     });
   }
 
-  /* ---------------------------------------------------- Header & nav UX */
-  function wireHeader() {
-    const header = $("#site-header");
-    const onScroll = () => {
-      header.classList.toggle("scrolled", window.scrollY > 8);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
+  /* ──────────────────────────────────────────────────── Reveal animation */
 
-    // Mobile nav toggle
-    const toggle = $(".nav-toggle");
-    const menu = $("#nav-menu");
-    toggle.addEventListener("click", () => {
-      const open = menu.classList.toggle("open");
-      toggle.setAttribute("aria-expanded", String(open));
-    });
-    menu.addEventListener("click", (e) => {
-      if (e.target.tagName === "A") {
-        menu.classList.remove("open");
-        toggle.setAttribute("aria-expanded", "false");
-      }
-    });
-  }
-
-  // Scroll-spy: highlight the active nav link.
-  function wireScrollSpy() {
-    const sections = $$("main section[id]");
-    const links = new Map(
-      $$(".nav-menu a").map((a) => [a.getAttribute("href").slice(1), a])
-    );
-    const spy = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            links.forEach((a) => a.classList.remove("active"));
-            const link = links.get(entry.target.id);
-            if (link) link.classList.add("active");
-          }
-        });
-      },
-      { rootMargin: "-45% 0px -50% 0px" }
-    );
-    sections.forEach((s) => spy.observe(s));
-  }
-
-  // Reveal-on-scroll animation.
   let revealObserver;
+
   function observeReveals() {
     if (!revealObserver) {
       revealObserver = new IntersectionObserver(
@@ -510,24 +583,31 @@
             }
           });
         },
-        { threshold: 0.12 }
+        { threshold: 0.08 }
       );
     }
     $$(".reveal:not(.in)").forEach((node) => revealObserver.observe(node));
   }
 
-  /* ------------------------------------------------------------ Init */
+  /* ──────────────────────────────────────────────────── Init */
+
   function init() {
     if (!data) return;
+
     renderStaticContent();
     renderTiers();
     renderFilters();
     renderTeam();
     wireSearch();
     wireModal();
-    wireHeader();
-    wireScrollSpy();
-    observeReveals();
+    wireSidebarToggle();
+    wireNavigation();
+
+    // Show initial section
+    showSection(0);
+
+    // Trigger reveals for initial panel
+    setTimeout(observeReveals, 100);
   }
 
   if (document.readyState === "loading") {
