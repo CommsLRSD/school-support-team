@@ -430,27 +430,9 @@
       header.appendChild(heading);
       block.appendChild(header);
 
-      // Direct members
-      if (directMatches.length) {
-        const membersLabel = el("p", { class: "subteam-label", text: "Team Members" });
-        block.appendChild(membersLabel);
-        const grid = el("div", { class: "member-grid" });
-        directMatches.forEach((m) => grid.appendChild(buildMemberCard(m)));
-        block.appendChild(grid);
-      }
-
-      // Sub-team members
-      subteamMatches.forEach((st) => {
-        block.appendChild(el("p", { class: "subteam-label", text: st.name }));
-        const grid = el("div", { class: "member-grid" });
-        st.members.forEach((m) => grid.appendChild(buildMemberCard(m)));
-        block.appendChild(grid);
-      });
-
-      // Key work + process — shown after members (hidden during search to focus on people)
+      // Key work + process (hidden during search to focus on people)
       if (!activeQuery) {
         const meta = el("div", { class: "area-meta" });
-        meta.appendChild(el("p", { class: "area-meta-label", text: "Key Work & Process" }));
         const kw   = el("div", { class: "keywork-card" });
         kw.appendChild(el("h4", { text: "Key Work" }));
         const kwList = el("ul", { class: "check-list" });
@@ -469,6 +451,21 @@
         }
         block.appendChild(meta);
       }
+
+      // Direct members
+      if (directMatches.length) {
+        const grid = el("div", { class: "member-grid" });
+        directMatches.forEach((m) => grid.appendChild(buildMemberCard(m)));
+        block.appendChild(grid);
+      }
+
+      // Sub-team members
+      subteamMatches.forEach((st) => {
+        block.appendChild(el("p", { class: "subteam-label", text: st.name }));
+        const grid = el("div", { class: "member-grid" });
+        st.members.forEach((m) => grid.appendChild(buildMemberCard(m)));
+        block.appendChild(grid);
+      });
 
       wrap.appendChild(block);
     });
