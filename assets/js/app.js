@@ -10,6 +10,9 @@
   "use strict";
 
   const data = window.SCST;
+  const MAX_SUPPORT_ACTIONS = 4;
+  const DARK_TIER_INDEX = 1;
+  const EMPHASIS_ROLE_MATCH = /director/i;
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
@@ -266,7 +269,17 @@
     // How we support
     const supportIntro = $("#support-intro");
     if (supportIntro) supportIntro.textContent = data.howWeSupport.intro;
-    listItems($("#support-actions"), data.howWeSupport.actions.slice(0, 4));
+    const supportActions = data.howWeSupport.actions || [];
+    const supportActionList = $("#support-actions");
+    if (supportActionList) {
+      listItems(supportActionList, supportActions.slice(0, MAX_SUPPORT_ACTIONS));
+      if (supportActions.length > MAX_SUPPORT_ACTIONS) {
+        const hiddenCount = supportActions.length - MAX_SUPPORT_ACTIONS;
+        supportActionList.appendChild(
+          el("li", { class: "pill-list-more", text: `+${hiddenCount} more ways we support schools` })
+        );
+      }
+    }
 
     // Data
     listItems($("#data-sources"), data.dataSources);
@@ -283,7 +296,7 @@
     const equityWrap = $("#equity-tiers");
     if (equityWrap) {
       data.tiers.forEach((tier, i) => {
-        const classes = ["equity-card", "t" + (i + 1), i === 1 ? "equity-card-dark" : ""].join(" ").trim();
+        const classes = ["equity-card", "t" + (i + 1), i === DARK_TIER_INDEX ? "equity-card-dark" : ""].join(" ").trim();
         const card = el("div", { class: classes });
         card.appendChild(el("span", { class: "ec-level", text: tier.level }));
         card.appendChild(el("h4", { text: tier.name }));
@@ -319,7 +332,7 @@
     const contactWrap = $("#contact-leaders");
     if (contactWrap) {
       data.areas[0].members.slice(0, 3).forEach((m) => {
-        const cardClass = m.role.toLowerCase().includes("director")
+        const cardClass = EMPHASIS_ROLE_MATCH.test(m.role)
           ? "contact-card contact-card-dark"
           : "contact-card";
         const card = el("div", { class: cardClass });
@@ -339,15 +352,21 @@
     $$(".focus-carousel").forEach((wrap, carouselIndex) => {
       const items = Array.from(wrap.children);
       if (items.length <= 1) return;
-      if (wrap.dataset.carouselReady === "true") return;
-      wrap.dataset.carouselReady = "true";
+      if (wrap.classList.contains("carousel-ready")) return;
+      wrap.classList.add("carousel-ready");
 
       let currentIndex = 0;
       wrap.classList.add("is-carousel");
       items.forEach((item, i) => {
         item.classList.add("carousel-item");
+        item.setAttribute("aria-label", `Card ${i + 1} of ${items.length}`);
         item.hidden = i !== currentIndex;
       });
+      wrap.setAttribute("role", "region");
+      const panel = wrap.closest(".content-panel");
+      const panelLabelNode = panel && (panel.querySelector(".panel-eyebrow") || panel.querySelector("h2"));
+      const panelLabel = panelLabelNode ? panelLabelNode.textContent.trim() : "Section highlights";
+      wrap.setAttribute("aria-label", panelLabel);
 
       const controls = el("div", { class: "focus-carousel-controls" });
       const prevBtn = el("button", {
@@ -366,17 +385,24 @@
         items.forEach((item, i) => {
           item.hidden = i !== currentIndex;
           item.classList.toggle("is-active", i === currentIndex);
+          item.setAttribute("tabindex", i === currentIndex ? "0" : "-1");
         });
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === items.length - 1;
         status.textContent = `${currentIndex + 1} / ${items.length}`;
       }
 
       prevBtn.addEventListener("click", () => {
-        currentIndex = (currentIndex - 1 + items.length) % items.length;
+        if (currentIndex === 0) return;
+        currentIndex -= 1;
         renderCarouselItem();
+        items[currentIndex].focus({ preventScroll: true });
       });
       nextBtn.addEventListener("click", () => {
-        currentIndex = (currentIndex + 1) % items.length;
+        if (currentIndex === items.length - 1) return;
+        currentIndex += 1;
         renderCarouselItem();
+        items[currentIndex].focus({ preventScroll: true });
       });
 
       controls.appendChild(prevBtn);
