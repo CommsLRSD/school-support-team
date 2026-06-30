@@ -528,10 +528,7 @@
     }
     if (noResults) noResults.hidden = true;
 
-    if (activeMemberIndex > visibleMembers.length - 1) {
-      activeMemberIndex = visibleMembers.length - 1;
-    }
-    if (activeMemberIndex < 0) activeMemberIndex = 0;
+    activeMemberIndex = Math.max(0, Math.min(activeMemberIndex, visibleMembers.length - 1));
     const selectedMember = visibleMembers[activeMemberIndex];
     renderTeamContext(selectedMember);
 
