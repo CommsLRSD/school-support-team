@@ -632,10 +632,8 @@ img { max-width: 100%; display: block; }
   cursor: pointer;
   transition: border-color .18s, box-shadow .18s, transform .18s;
   font-family: var(--font-head);
-  text-align: left;
-  font: inherit;
-  font-family: var(--font-head);
   font-weight: 500;
+  text-align: left;
 }
 .overview-card:hover {
   border-color: var(--brand);
