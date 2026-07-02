@@ -541,12 +541,12 @@
       let cur = 0;
       items.forEach((item, i) => {
         item.classList.add("carousel-item");
-        const summary = (item.querySelector("h3, h4, .cc-name, p") || {}).textContent || "item";
+        const summary = item.querySelector("h3, h4, .cc-name, p")?.textContent || "item";
         item.setAttribute("aria-label", `Card ${i + 1} of ${items.length}: ${summary.trim().slice(0, 80)}`);
         item.hidden = i !== cur;
       });
       wrap.setAttribute("role", "region");
-      const panelLabel = (wrap.closest(".content-panel")?.querySelector(".panel-eyebrow, h2") || {}).textContent || "highlights";
+      const panelLabel = wrap.closest(".content-panel")?.querySelector(".panel-eyebrow, h2")?.textContent || "highlights";
       wrap.setAttribute("aria-label", panelLabel.trim());
 
       const controls = el("div", { class: "focus-carousel-controls" });
@@ -924,7 +924,8 @@
             setTimeout(() => {
               const tabs = $$(".tier-tab");
               tabs.forEach((tab) => {
-                if (tab.querySelector(".tt-level") && tab.querySelector(".tt-level").textContent.toLowerCase() === hit.label.split(":")[0].trim().toLowerCase()) {
+                const levelEl = tab.querySelector(".tt-level");
+                if (levelEl && levelEl.textContent.toLowerCase() === hit.label.split(":")[0].trim().toLowerCase()) {
                   tab.click();
                 }
               });
