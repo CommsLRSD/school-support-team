@@ -4,6 +4,12 @@
  *
  * Keeping content in a single structured file makes it easy to update names,
  * roles, and bios without touching the markup or interaction logic.
+ *
+ * CONTENT MAINTENANCE NOTES:
+ *   - To update team members, edit the `areas[*].members` or `areas[*].subteams[*].members` arrays.
+ *   - To update section text, edit the named section objects (whoWeAre, whyItMatters, etc.).
+ *   - To update key takeaways shown at the end of each guided-mode step, edit `takeaways`.
+ *   - To add a new support tier, push a new object into `tiers`.
  */
 
 const SCST = {
@@ -15,6 +21,7 @@ const SCST = {
       "Supporting Every School. Strengthening Every Classroom. Ensuring Every Student Thrives.",
   },
 
+  // ── Section: Who We Are ──────────────────────────────────────────────────
   whoWeAre: {
     intro:
       "The School and Classroom Support Team (SCST) partners with schools across the Louis Riel School Division to strengthen student learning, well-being, and belonging.",
@@ -26,15 +33,16 @@ const SCST = {
     workAlongside: [
       "Build instructional and system capacity",
       "Respond to identified student and school needs",
-      "Close opportunity gaps—particularly for Indigenous students and learners experiencing barriers",
+      "Close opportunity gaps — particularly for Indigenous students and learners experiencing barriers",
     ],
     summary:
       "SCST is a coordinated, system-level team that integrates leadership, instructional support, clinical services, Indigenous education, and specialized supports into one aligned model.",
   },
 
+  // ── Section: Why It Matters ──────────────────────────────────────────────
   whyItMatters: {
     intro:
-      "Divisional data—including literacy and numeracy screening, progress monitoring, attendance, and well-being indicators—continues to highlight:",
+      "Divisional data — including literacy and numeracy screening, progress monitoring, attendance, and well-being indicators — continues to highlight:",
     highlights: [
       "Persistent achievement gaps across schools",
       "Disproportionate impact on Indigenous students",
@@ -52,6 +60,7 @@ const SCST = {
     ],
   },
 
+  // ── Section: How We Support ──────────────────────────────────────────────
   howWeSupport: {
     intro:
       "SCST collaborates with schools through differentiated, data-informed support to:",
@@ -64,12 +73,14 @@ const SCST = {
     ],
   },
 
+  // ── Tiers of Support ─────────────────────────────────────────────────────
   tiers: [
     {
       id: "tier1",
       level: "Tier 1",
       name: "Universal Support",
       shortLabel: "Universal",
+      color: "#1f8a70",
       summary:
         "All schools receive universal support focused on building strong, inclusive, and responsive learning environments.",
       includes: [
@@ -87,6 +98,7 @@ const SCST = {
       level: "Tier 2",
       name: "Targeted Support",
       shortLabel: "Targeted",
+      color: "#315ba6",
       summary:
         "Schools in Tier 2 receive targeted, short- to medium-term support focused on specific areas of need identified through data and school context.",
       includes: [
@@ -104,6 +116,7 @@ const SCST = {
       level: "Tier 3",
       name: "Intensive Support",
       shortLabel: "Intensive",
+      color: "#7c3aed",
       summary:
         "Schools identified for Tier 3 support receive the highest level of involvement from SCST. Support is frequent, collaborative, and responsive to complex or urgent needs.",
       includes: [
@@ -119,6 +132,7 @@ const SCST = {
     },
   ],
 
+  // ── Data ─────────────────────────────────────────────────────────────────
   dataSources: [
     "Literacy and numeracy screening",
     "Progress monitoring data",
@@ -132,8 +146,9 @@ const SCST = {
     "Ongoing monitoring and adjustment",
   ],
 
-  // Six integrated areas of support. Each area lists its purpose, key work,
-  // and team members (optionally grouped into sub-teams).
+  // ── Six Integrated Areas of Support ──────────────────────────────────────
+  // Each area lists its purpose, key work, and team members
+  // (optionally grouped into sub-teams).
   areas: [
     {
       id: "leadership",
@@ -384,7 +399,7 @@ const SCST = {
         {
           name: "Kim Mackey",
           role: "Social Worker",
-          bio: "Kim supports students’ social-emotional well-being, mental health, and overall sense of belonging within the school community. She collaborates with educators, families and caregivers, and community partners to provide responsive supports that help students navigate challenges, build resilience, and engage fully in their learning.",
+          bio: "Kim supports students' social-emotional well-being, mental health, and overall sense of belonging within the school community. She collaborates with educators, families and caregivers, and community partners to provide responsive supports that help students navigate challenges, build resilience, and engage fully in their learning.",
         },
       ],
     },
@@ -432,6 +447,7 @@ const SCST = {
     },
   ],
 
+  // ── School-Based Support ─────────────────────────────────────────────────
   schoolBased: {
     intro: [
       "The School and Classroom Support Team (SCST) provides supports based on a combination of divisional data, school-level context, and identified student and staff needs. This responsive approach ensures that resources are aligned to where they will have the greatest impact, while also building long-term capacity across all schools.",
@@ -467,6 +483,7 @@ const SCST = {
     ],
   },
 
+  // ── Looking Ahead ────────────────────────────────────────────────────────
   lookingAhead: {
     intro: "SCST continues to evolve to:",
     points: [
@@ -476,8 +493,31 @@ const SCST = {
       "Expand impact through tiered instructional models",
       "Improve outcomes for students, particularly those experiencing barriers",
     ],
+    // TODO: Update mentorship list as the program evolves.
     mentorship:
       "Specialized Teacher Mentorship (Library, Phys. Ed, Music, Applied Technology, Human Ecology, Student Services, Teachers New To LRSD)",
+  },
+
+  // ── Key Takeaways ─────────────────────────────────────────────────────────
+  // Displayed at the end of each section in Guided mode.
+  // Update these to adjust the key message for each section.
+  takeaways: {
+    overview:
+      "SCST is one aligned team — six integrated areas working together to support every school and every student across LRSD.",
+    why:
+      "Where need is greatest, support is deepest. SCST's work is driven by equity, evidence, and a commitment to closing opportunity gaps.",
+    support:
+      "Support isn't one-size-fits-all. It's differentiated, data-informed, and built on genuine relationships with school teams.",
+    data:
+      "Data guides everything — from identifying where to focus to measuring whether support is actually making a difference.",
+    team:
+      "Six areas. One direction. Diverse expertise, coordinated together to serve every school across Louis Riel School Division.",
+    schools:
+      "Support follows the data. Schools with the most complex needs receive the most embedded and sustained engagement.",
+    ahead:
+      "SCST continues to grow — becoming more embedded, more coordinated, and more deeply focused on student outcomes.",
+    contact:
+      "The right support is always a conversation away. Reach out to connect with the SCST team.",
   },
 };
 
