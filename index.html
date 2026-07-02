@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="The School and Classroom Support Team (SCST) partners with schools across the Louis Riel School Division to strengthen student learning, well-being, and belonging. Explore who we are, how we support schools, and who to contact."
+      content="Explore the School and Classroom Support Team through a single interactive page with team details, support tiers, and contact information."
     />
     <title>School &amp; Classroom Support Team · Louis Riel School Division</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Ubuntu:wght@700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Nunito:wght@400;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="assets/css/styles.css" />
@@ -19,264 +19,116 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <div class="dashboard-layout">
-
-      <!-- ── Sidebar ── -->
-      <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
-        <div class="sidebar-header">
-          <img src="assets/lrsd-logo-fullcolour.svg" alt="Louis Riel School Division" class="sidebar-logo" />
+    <header class="site-header">
+      <div class="header-brand">
+        <img src="assets/lrsd-logo-fullcolour.svg" alt="Louis Riel School Division" class="brand-logo" />
+        <div>
+          <p class="brand-title">School &amp; Classroom Support Team</p>
+          <p class="brand-subtitle">Louis Riel School Division</p>
         </div>
+      </div>
+      <nav class="jump-nav" aria-label="Jump to section" id="jump-nav">
+        <a href="#who">Who We Are</a>
+        <a href="#impact">Why It Matters</a>
+        <a href="#support">How We Support</a>
+        <a href="#areas">Areas</a>
+        <a href="#team">Team</a>
+        <a href="#schools">For Schools</a>
+        <a href="#ahead">Looking Ahead</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
 
-        <nav class="sidebar-nav" id="sidebar-nav" aria-label="Section navigation">
-          <a href="#" class="nav-list-item active" data-section="overview" aria-current="page">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            </span>
-            <span class="nav-label">Who We Are</span>
-          </a>
-          <a href="#" class="nav-list-item" data-section="why">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            </span>
-            <span class="nav-label">Why It Matters</span>
-          </a>
-          <a href="#" class="nav-list-item" data-section="support">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-            </span>
-            <span class="nav-label">How We Support</span>
-          </a>
-          <a href="#" class="nav-list-item" data-section="data">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            </span>
-            <span class="nav-label">Using Data</span>
-          </a>
-          <a href="#" class="nav-list-item" data-section="team">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </span>
-            <span class="nav-label">Our Team</span>
-          </a>
-          <a href="#" class="nav-list-item" data-section="schools">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </span>
-            <span class="nav-label">For Schools</span>
-          </a>
-          <a href="#" class="nav-list-item" data-section="ahead">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 16 12 12 16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            </span>
-            <span class="nav-label">Looking Ahead</span>
-          </a>
-          <a href="#" class="nav-list-item" data-section="contact">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </span>
-            <span class="nav-label">Contact</span>
-          </a>
-        </nav>
+    <main id="main">
+      <section class="hero reveal" id="top" data-nav="top">
+        <p class="eyebrow">Interactive Overview</p>
+        <h1 id="hero-tagline"></h1>
+        <p class="hero-intro" id="hero-intro"></p>
+        <div class="hero-actions" id="hero-actions"></div>
+      </section>
 
-        <footer class="sidebar-footer">
-          <div class="nav-pagination">
-            <button class="pag-btn" id="prev-btn" aria-label="Go to previous section" disabled>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-              <span>Prev</span>
-            </button>
-            <span class="pag-counter" id="pag-counter" aria-live="polite">1 / 8</span>
-            <button class="pag-btn" id="next-btn" aria-label="Go to next section">
-              <span>Next</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          </div>
-          <p class="sidebar-footer-brand">School &amp; Classroom Support Team</p>
-        </footer>
-      </aside>
+      <section class="section reveal" id="who" data-nav="who">
+        <p class="eyebrow">Who We Are</p>
+        <h2 id="who-intro"></h2>
+        <div class="grid two-col">
+          <article class="card">
+            <h3>Our work is grounded in</h3>
+            <ul class="check-list" id="grounded-in"></ul>
+          </article>
+          <article class="card card-accent">
+            <h3>We work alongside schools to</h3>
+            <ul class="check-list" id="work-alongside"></ul>
+          </article>
+        </div>
+        <p class="callout" id="who-summary"></p>
+        <div class="stats" id="hero-stats"></div>
+      </section>
 
-      <!-- ── Main content ── -->
-      <div class="main-content">
-        <header class="main-header">
-          <button
-            id="sidebar-toggle-btn"
-            class="sidebar-toggle-btn"
-            aria-label="Toggle sidebar menu"
-            aria-expanded="false"
-            aria-controls="sidebar"
-          >
-            <svg class="hamburger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-              <line x1="3" y1="6"  x2="21" y2="6"/>
-              <line x1="3" y1="12" x2="21" y2="12"/>
-              <line x1="3" y1="18" x2="21" y2="18"/>
-            </svg>
-          </button>
-          <div class="header-titles">
-            <span class="header-title-main">School &amp; Classroom Support Team</span>
-            <span class="header-title-sub">Louis Riel School Division</span>
-          </div>
-        </header>
+      <section class="section reveal" id="impact" data-nav="impact">
+        <p class="eyebrow">Why It Matters</p>
+        <h2 id="why-intro"></h2>
+        <div class="grid three-col" id="why-walkthrough"></div>
+      </section>
 
-        <div class="content-body" id="main">
+      <section class="section reveal" id="support" data-nav="support">
+        <p class="eyebrow">How We Support</p>
+        <h2 id="support-intro"></h2>
+        <ul class="pill-list" id="support-actions"></ul>
+        <div class="grid three-col" id="tiers-grid"></div>
+      </section>
 
-          <!-- ── Panel 1: Who We Are ── -->
-          <section class="content-panel" id="panel-overview" role="main">
-            <div class="panel-header">
-              <p class="panel-eyebrow">Who We Are</p>
-              <h2 id="who-intro"></h2>
-            </div>
-            <div class="panel-grid grid-2 focus-carousel">
-              <div class="info-card">
-                <h3>Our work is grounded in</h3>
-                <ul class="check-list" id="grounded-in"></ul>
-              </div>
-              <div class="info-card info-card-dark">
-                <h3>We work alongside schools to</h3>
-                <ul class="check-list" id="work-alongside"></ul>
-              </div>
-            </div>
-            <p class="lead-callout" id="who-summary"></p>
-            <div class="stats-row" id="hero-stats"></div>
-          </section>
+      <section class="section reveal" id="areas" data-nav="areas">
+        <p class="eyebrow">Integrated Areas</p>
+        <h2>Six areas, one coordinated support model.</h2>
+        <div class="grid three-col" id="areas-grid"></div>
+      </section>
 
-          <!-- ── Panel 2: Why It Matters ── -->
-          <section class="content-panel" id="panel-why" hidden>
-            <div class="panel-header">
-              <p class="panel-eyebrow">Why This Work Matters</p>
-              <h2 id="why-intro"></h2>
-            </div>
-            <div class="panel-grid grid-3 focus-carousel" id="why-walkthrough"></div>
-          </section>
+      <section class="section reveal" id="team" data-nav="team">
+        <p class="eyebrow">Our Team</p>
+        <h2>Find team members by role or support area.</h2>
+        <div class="team-controls">
+          <input
+            type="search"
+            id="team-search"
+            placeholder="Search by name or role"
+            aria-label="Search team members"
+          />
+          <div class="filter-chips" id="area-filters" role="group" aria-label="Filter team by area"></div>
+        </div>
+        <p class="results-count" id="results-count" aria-live="polite"></p>
+        <div class="grid three-col" id="team-grid" aria-live="polite"></div>
+        <p class="no-results" id="no-results" hidden>
+          No team members match your search. Try a different name, role, or area.
+        </p>
+      </section>
 
-          <!-- ── Panel 3: How We Support ── -->
-          <section class="content-panel" id="panel-support" hidden>
-            <div class="panel-header">
-              <p class="panel-eyebrow">How We Support Schools</p>
-              <h2 id="support-intro"></h2>
-              <ul class="pill-list" id="support-actions"></ul>
-            </div>
-            <h3 class="subhead">Levels of Support</h3>
-            <p class="subhead-note">Select a tier to explore what support looks like at each level.</p>
-            <div class="tier-explorer">
-              <div class="tier-tabs" id="tier-tabs" role="tablist" aria-label="Levels of support"></div>
-              <div class="tier-panel" id="tier-panel"></div>
-            </div>
-          </section>
+      <section class="section reveal" id="schools" data-nav="schools">
+        <p class="eyebrow">For Schools</p>
+        <h2>Support is aligned to where it has the greatest impact.</h2>
+        <div class="prose" id="school-based-intro"></div>
+        <p class="callout" id="equity-intro"></p>
+        <div class="grid three-col" id="schools-walkthrough"></div>
+      </section>
 
-          <!-- ── Panel 4: Using Data ── -->
-          <section class="content-panel" id="panel-data" hidden>
-            <div class="panel-header">
-              <p class="panel-eyebrow">Using Data to Guide Our Work</p>
-              <h2>Support is identified, targeted, and monitored using divisional data.</h2>
-            </div>
-            <div class="panel-grid grid-2 focus-carousel">
-              <div class="info-card">
-                <h3>Data sources we use</h3>
-                <ul class="check-list" id="data-sources"></ul>
-              </div>
-              <div class="info-card info-card-accent">
-                <h3>This ensures</h3>
-                <ul class="check-list" id="data-ensures"></ul>
-              </div>
-            </div>
-          </section>
+      <section class="section reveal" id="ahead" data-nav="ahead">
+        <p class="eyebrow">Looking Ahead</p>
+        <h2 id="ahead-intro"></h2>
+        <ul class="check-list columns" id="ahead-points"></ul>
+        <p class="callout" id="ahead-mentorship"></p>
+      </section>
 
-          <!-- ── Panel 5: Our Team ── -->
-          <section class="content-panel" id="panel-team" hidden>
-            <div class="panel-header">
-              <p class="panel-eyebrow">Our Team Structure</p>
-              <h2>Six integrated areas of support — one aligned team.</h2>
-              <p class="panel-lead">
-                Search by name or role, or filter by area to find who is responsible
-                for what and how to connect with the right support.
-              </p>
-            </div>
-            <div class="team-controls">
-              <div class="search-field">
-                <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M21 21l-4.3-4.3M11 18a7 7 0 100-14 7 7 0 000 14z"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
-                <input
-                  type="search"
-                  id="team-search"
-                  placeholder="Search by name or role…"
-                  aria-label="Search team members by name or role"
-                />
-              </div>
-              <div class="filter-chips" id="area-filters" role="group" aria-label="Filter team by area"></div>
-            </div>
-            <p class="results-count" id="results-count" aria-live="polite"></p>
-            <div class="team-compact" id="team-compact" aria-live="polite">
-              <div class="team-context" id="team-context"></div>
-              <div class="team-member-stage" id="team-member-stage"></div>
-            </div>
-            <p class="no-results" id="no-results" hidden>
-              No team members match your search. Try a different name, role, or area.
-            </p>
-          </section>
+      <section class="section reveal" id="contact" data-nav="contact">
+        <p class="eyebrow">Contact</p>
+        <h2>Connect with the right support for your school.</h2>
+        <div class="grid three-col" id="contact-leaders"></div>
+      </section>
+    </main>
 
-          <!-- ── Panel 6: For Schools ── -->
-          <section class="content-panel" id="panel-schools" hidden>
-            <div class="panel-header">
-              <p class="panel-eyebrow">School-Based Support</p>
-              <h2>Responsive support, aligned to where it has the greatest impact.</h2>
-            </div>
-            <div class="prose" id="school-based-intro"></div>
-            <h3 class="subhead">Equity Support School Model</h3>
-            <p class="subhead-note" id="equity-intro"></p>
-            <div class="panel-grid grid-3 focus-carousel" id="schools-walkthrough"></div>
-          </section>
+    <a class="to-top" href="#top" aria-label="Back to top">↑</a>
 
-          <!-- ── Panel 7: Looking Ahead ── -->
-          <section class="content-panel" id="panel-ahead" hidden>
-            <div class="panel-header">
-              <p class="panel-eyebrow">Looking Ahead</p>
-              <h2 id="ahead-intro"></h2>
-            </div>
-            <ul class="check-list columns" id="ahead-points"></ul>
-            <p class="lead-callout" id="ahead-mentorship"></p>
-          </section>
-
-          <!-- ── Panel 8: Contact ── -->
-          <section class="content-panel" id="panel-contact" hidden>
-            <div class="panel-header center">
-              <p class="panel-eyebrow">Get in Touch</p>
-              <h2>Connect with the right support for your school</h2>
-              <p class="panel-lead">
-                Not sure where to start? Reach out to our leadership team and we'll
-                connect you with the right person. School teams can also request
-                consultation and support directly through SCST.
-              </p>
-            </div>
-            <div class="panel-grid grid-3 focus-carousel" id="contact-leaders"></div>
-            <p class="contact-note">
-              For general inquiries, contact the Louis Riel School Division and ask
-              for the School and Classroom Support Team.
-            </p>
-          </section>
-
-        </div><!-- /.content-body -->
-      </div><!-- /.main-content -->
-
-      <!-- Sidebar overlay (mobile) -->
-      <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
-
-    </div><!-- /.dashboard-layout -->
-
-    <!-- Member bio modal -->
     <div class="modal" id="member-modal" hidden>
       <div class="modal-backdrop" data-close></div>
-      <div
-        class="modal-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-name"
-      >
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-name">
         <button class="modal-close" data-close aria-label="Close">&times;</button>
         <div class="modal-head">
           <img class="modal-photo" id="modal-photo" src="assets/placeholder-headshot.jpg" alt="" />
