@@ -1,28 +1,28 @@
 :root {
-  --bg: #f4f7ff;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-alt: #101a36;
-  --text: #15223d;
-  --muted: #4c5d80;
-  --line: #d6dff0;
-  --primary: #5b4df8;
-  --secondary: #0ea5a0;
-  --accent: #f97316;
-  --radius: 16px;
-  --shadow: 0 14px 30px rgba(21, 34, 61, 0.08);
+  --surface-alt: #000000;
+  --text: #222222;
+  --muted: #777777;
+  --line: #eaeaea;
+  --primary: #000000;
+  --secondary: #555555;
+  --accent: #000000;
+  --radius: 4px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  font-family: "Nunito", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at top right, #e8edff 0%, var(--bg) 42%, #f9fbff 100%);
+  background: var(--bg);
   line-height: 1.6;
 }
 
-h1, h2, h3 { font-family: "Montserrat", system-ui, sans-serif; margin: 0 0 .6rem; line-height: 1.2; }
+h1, h2, h3 { font-family: system-ui, -apple-system, sans-serif; margin: 0 0 .6rem; line-height: 1.2; }
 p { margin: 0 0 .8rem; }
 img { max-width: 100%; display: block; }
 
@@ -82,7 +82,7 @@ img { max-width: 100%; display: block; }
 .jump-nav a.active,
 .jump-nav a:hover {
   color: #fff;
-  background: linear-gradient(120deg, var(--primary), #7c3aed);
+  background: var(--primary);
   border-color: transparent;
 }
 
@@ -103,7 +103,7 @@ main {
 }
 
 .hero {
-  background: linear-gradient(145deg, #ffffff 0%, #f4f3ff 60%, #eefcff 100%);
+  background: var(--surface);
 }
 
 .eyebrow {
@@ -148,7 +148,7 @@ main {
   padding: 1rem;
 }
 .card-accent {
-  background: linear-gradient(145deg, #121d3f, #1f2f5f);
+  background: var(--surface-alt);
   color: #eef2ff;
 }
 .card-accent h3 { color: #fff; }
@@ -164,7 +164,7 @@ main {
   width: .55rem;
   height: .55rem;
   border-radius: 999px;
-  background: linear-gradient(120deg, var(--primary), var(--secondary));
+  background: var(--primary);
   position: absolute;
   left: 0;
   top: .58em;
@@ -179,9 +179,9 @@ main {
   gap: .5rem;
 }
 .pill-list li {
-  background: #ecf1ff;
-  color: #2e3f6f;
-  border: 1px solid #cdd9ff;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: .35rem .75rem;
   font-size: .84rem;
@@ -190,7 +190,7 @@ main {
 
 .callout {
   border-left: 4px solid var(--accent);
-  background: #fff8f3;
+  background: var(--bg);
   border-radius: 0 12px 12px 0;
   padding: .95rem 1rem;
 }
@@ -259,9 +259,9 @@ main {
 }
 .member-card button {
   margin-top: auto;
-  border: 1px solid #cdd9ff;
-  background: #eef2ff;
-  color: #253767;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
   border-radius: 10px;
   padding: .45rem .6rem;
   font: inherit;
@@ -288,6 +288,7 @@ main {
 }
 
 .to-top {
+  display: grid;
   position: fixed;
   right: .8rem;
   bottom: .8rem;
@@ -297,17 +298,19 @@ main {
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  display: grid;
   place-items: center;
   font-weight: 700;
 }
 
 .modal {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 200;
-  display: grid;
   place-items: center;
+}
+.modal:not([hidden]) {
+  display: grid;
 }
 .modal-backdrop {
   position: absolute;
